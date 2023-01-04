@@ -1,5 +1,5 @@
 ---
-title: "Fuzzy C Means"
+title: "Algoritma Fuzzy C Means Dengan R"
 author: "A. Nizam Zidan-Institut Teknologi Statistika dan Bisnis Muhammadiyah"
 date: "`r Sys.Date()`"
 output: 
@@ -23,24 +23,46 @@ text-align: justify}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# R Markdown
+# Algoritma Fuzzy C-Means
+Fuzzy C-Means adalah salah satu algoritma dari teknik clustering atau pengelompokkan data.
+Fuzzy C-Means tidak hanya memiliki nilai yang sama dalam satu cluster tetapi juga memiliki dua atau lebih kelompok menurut level keanggotaannya.
+Fuzzy c means termasuk kedalam soft clustering karena penentuan keanggotaannya berdasarkan derajat keanggotaan.
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents [@deCarvalho2012]. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+# Tahapan Algoritma Fuzzy C-Means
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+# Eksperimen Algoritma Fuzzy C-Means
 
-```{r cars}
-summary(cars)
+## Library
+```{r eval=FALSE}
+library(dplyr)
+library(clValid)
+iris
+table(iris$Species)
+clust <- sapply(iris[, -5], scale)
+intvalid <- clValid(clust, 2:5, clMethods=c("fanny"), 
+                    maxit = 1500,
+                    validation="internal",
+                    metric="euclidean")
+ summary(intvalid)
+ hc <- clusters(intvalid, "fanny")
+hc$`2`$coeff
+res.fanny <- fanny(clust, 2, metric='euclidean', maxit = 1500)
+res.fanny$coeff
+table(hc$`2`$clustering, iris[,5])
+table(hc$`2`$clustering, iris[,5])
+
+    setosa versicolor virginica
+  1     50          0         0
+  2      0         50        50
+df$fuzzy <- hc$`2`$clustering
+profile <- ddply(df,.(fuzzy), summarize,
+               count=length(fuzzy))
+profile
+fuzzy count
+1     1    50
+2     2   100
 ```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 # Referensi
+https://stackoverflow.com/questions/53284245/fuzzy-c-means-clustering-in-r?newreg=8884e2e91f694f458b807d2b3c0be402&answertab=trending#tab-top
+
