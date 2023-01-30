@@ -1,0 +1,323 @@
+---
+title: "Algoritma Fuzzy C means With R"
+date: "`r Sys.Date()`"
+author: A. Nizam Zidan-Institut Teknologi Statistika dan Bisnis Muhammadiyah
+output:
+  rmdformats::readthedown:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: false
+    highlight: tango
+bibliography: references.bib
+```
+```{=html}
+<style>
+body{
+text-align: justify}
+</style>
+```
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Algoritma Fuzzy C-Means
+Fuzzy C-Means adalah salah satu algoritma dari teknik clustering atau pengelompokkan data.
+Fuzzy C-Means tidak hanya memiliki nilai yang sama dalam satu cluster tetapi juga memiliki dua atau lebih kelompok menurut level keanggotaannya.
+Fuzzy c means termasuk kedalam soft clustering karena penentuan keanggotaannya berdasarkan derajat keanggotaan.
+
+# Tahapan Algoritma Fuzzy C-Means
+
+# Eksperimen Algoritma Fuzzy C-Means
+```{r}
+library(ppclust)
+library(factoextra)
+```
+```{r}
+library(cluster)
+library(fclust)
+data("iris")
+x=iris[,-5]
+x
+```
+```{r}
+pairs(x, col=iris[,5])
+```
+```{r}
+res.upfc <- upfc(x, centers=3)
+v0 <- matrix(nrow=3, ncol=4,
+     c(5.0, 3.4, 1.4, 0.3,
+       6.7, 3.0, 5.6, 2.1,
+       5.8, 2.7, 4.3, 1.4),
+       byrow=TRUE)
+print(v0)
+```
+```{r}
+##      [,1] [,2] [,3] [,4]
+## [1,]  5.0  3.4  1.4  0.3
+## [2,]  6.7  3.0  5.6  2.1
+## [3,]  5.8  2.7  4.3  1.4
+res.upfc <- upfc(x, centers=v0)
+v0 <- inaparc::kmpp(x, k=3)$v
+print(v0)
+```
+```{r}
+##      Sepal.Length Sepal.Width Petal.Length Petal.Width
+## Cl.1          7.9         3.8          6.4         2.0
+## Cl.2          4.9         3.1          1.5         0.1
+## Cl.3          5.7         2.8          4.5         1.3
+res.upfc <- upfc(x, centers=v0)
+u0 <- inaparc::imembrand(nrow(x), k=3)$u
+res.upfc <- upfc(x, centers=3, memberships=u0)
+res.upfc <- upfc(x, centers=3, alginitv="firstk", alginitu="imembrand")
+res.upfc <- upfc(x, centers=3, dmetric="euclidean")
+res.upfc <- upfc(x, centers=3, m=4)
+res.upfc <- upfc(x, centers=3, eta=3)
+res.upfc <- upfc(x, centers=3, a=3, b=2)
+res.upfc <- upfc(x, centers=3)
+as.data.frame(res.upfc$u)
+```
+```{r}
+as.data.frame(res.upfc$t)
+res.upfc$v0
+```
+```{r}
+library(ggcorrplot)
+corr <- round(cor(x), 1)
+
+# Plot
+ggcorrplot(corr,
+           type = "lower",
+           lab = TRUE, 
+           lab_size = 5,
+           title="Correlogram of Iris Dataset", 
+           ggtheme=theme_bw)
+```
+```{r}
+##           Sepal.Length Sepal.Width Petal.Length Petal.Width
+## Cluster 1          5.8         2.7          4.1         1.0
+## Cluster 2          6.4         2.8          5.6         2.2
+## Cluster 3          5.3         3.7          1.5         0.2
+res.upfc$v
+```
+```{r}
+##           Sepal.Length Sepal.Width Petal.Length Petal.Width
+## Cluster 1     5.944440    2.791643     4.429674   1.4231306
+## Cluster 2     6.629620    3.018968     5.478627   2.0051523
+## Cluster 3     5.000576    3.411018     1.480558   0.2503315
+summary(res.upfc)
+```
+```{r}
+## Summary for 'res.upfc'
+## 
+## Number of data objects:  150 
+## 
+## Number of clusters:  3 
+## 
+## Crisp clustering vector:
+##   [1] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+##  [36] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 2 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [71] 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 2 2 2
+## [106] 2 1 2 2 2 2 2 2 1 2 2 2 2 2 1 2 1 2 1 2 2 1 1 2 2 2 2 2 2 2 2 2 2 1 2
+## [141] 2 2 1 2 2 2 2 2 2 1
+## 
+## Initial cluster prototypes:
+##           Sepal.Length Sepal.Width Petal.Length Petal.Width
+## Cluster 1          5.8         2.7          4.1         1.0
+## Cluster 2          6.4         2.8          5.6         2.2
+## Cluster 3          5.3         3.7          1.5         0.2
+## 
+## Final cluster prototypes:
+##           Sepal.Length Sepal.Width Petal.Length Petal.Width
+## Cluster 1     5.944440    2.791643     4.429674   1.4231306
+## Cluster 2     6.629620    3.018968     5.478627   2.0051523
+## Cluster 3     5.000576    3.411018     1.480558   0.2503315
+## 
+## Distance between the final cluster prototypes
+##           Cluster 1 Cluster 2
+## Cluster 2  1.960201          
+## Cluster 3 11.347243 21.871439
+## 
+## Difference between the initial and final cluster prototypes
+##           Sepal.Length Sepal.Width Petal.Length Petal.Width
+## Cluster 1    0.1444400  0.09164324    0.3296736  0.42313065
+## Cluster 2    0.2296201  0.21896826   -0.1213729 -0.19484766
+## Cluster 3   -0.2994244 -0.28898196   -0.0194416  0.05033154
+## 
+## Root Mean Squared Deviations (RMSD): 0.4641953 
+## Mean Absolute Deviation (MAD): 3.215834 
+## 
+## Membership degrees matrix (top and bottom 5 rows): 
+##     Cluster 1 Cluster 2 Cluster 3
+## 1 0.000115388   3.6e-08 0.9797503
+## 2 0.000122701   2.6e-08 0.8663850
+## 3 0.000049248   8.0e-09 0.8784034
+## 4 0.000107585   2.0e-08 0.8200776
+## 5 0.000089677   2.6e-08 0.9664585
+## ...
+##     Cluster 1 Cluster 2 Cluster 3
+## 146 0.2214961 0.8784889 1.030e-07
+## 147 0.5583624 0.6241410 1.453e-06
+## 148 0.3772716 0.9302419 4.020e-07
+## 149 0.1946746 0.7243457 1.110e-07
+## 150 0.6153330 0.5782990 3.483e-06
+## 
+## Descriptive statistics for the membership degrees by clusters
+##           Size        Min        Q1      Mean    Median        Q3
+## Cluster 1   58 0.10571370 0.5836813 0.6754658 0.7131837 0.8045532
+## Cluster 2   42 0.07319913 0.4725497 0.6552011 0.7293231 0.8715668
+## Cluster 3   50 0.31374943 0.7305122 0.8161604 0.8715939 0.9185827
+##                 Max
+## Cluster 1 0.9806048
+## Cluster 2 0.9708134
+## Cluster 3 0.9976897
+## 
+## Dunn's Fuzziness Coefficients:
+## dunn_coeff normalized 
+##  0.6169534  0.4254301 
+## 
+## Within cluster sum of squares by cluster:
+##        1        2        3 
+## 35.21241 29.10857 15.15100 
+## (between_SS / total_SS =  87.52%) 
+## 
+## Available components: 
+##  [1] "u"          "t"          "v"          "v0"         "d"         
+##  [6] "x"          "cluster"    "csize"      "sumsqrs"    "k"         
+## [11] "m"          "eta"        "a"          "b"          "beta"      
+## [16] "iter"       "best.start" "func.val"   "comp.time"  "inpargs"   
+## [21] "algorithm"  "call"
+res.upfc$comp.time
+```
+```{r}
+## [1] 0.47
+res.upfc <- upfc(x, centers=3, nstart=4)
+res.upfc <- upfc(x, centers=3, nstart=4, fixmemb=TRUE)
+res.upfc$func.val
+```
+```{r}
+## [1] -186.3218 -186.3218 -186.3218 -186.3218
+res.upfc$iter
+res.upfc$iter
+res.upfc$comp.time
+## [1] 0.46 0.50 0.53 0.48
+res.upfc$best.start
+## [1] 2
+summary(res.upfc)
+```
+```{r}
+## Summary for 'res.upfc'
+## 
+## Number of data objects:  150 
+## 
+## Number of clusters:  3 
+## 
+## Crisp clustering vector:
+##   [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [36] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 3 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+##  [71] 3 3 3 3 3 3 3 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 2 3 2 2 2
+## [106] 2 3 2 2 2 2 2 2 3 2 2 2 2 2 3 2 3 2 3 2 2 3 3 2 2 2 2 2 2 2 2 2 2 3 2
+## [141] 2 2 3 2 2 2 2 2 2 3
+## 
+## Initial cluster prototypes:
+##           Sepal.Length Sepal.Width Petal.Length Petal.Width
+## Cluster 1          4.8         3.0          1.4         0.1
+## Cluster 2          6.3         3.4          5.6         2.4
+## Cluster 3          6.2         2.8          4.8         1.8
+## 
+## Final cluster prototypes:
+##           Sepal.Length Sepal.Width Petal.Length Petal.Width
+## Cluster 1     5.000576    3.411018     1.480558   0.2503315
+## Cluster 2     6.629620    3.018968     5.478627   2.0051523
+## Cluster 3     5.944440    2.791643     4.429674   1.4231306
+## 
+## Distance between the final cluster prototypes
+##           Cluster 1 Cluster 2
+## Cluster 2 21.871439          
+## Cluster 3 11.347243  1.960201
+## 
+## Difference between the initial and final cluster prototypes
+##           Sepal.Length  Sepal.Width Petal.Length Petal.Width
+## Cluster 1    0.2005756  0.411018040    0.0805584   0.1503315
+## Cluster 2    0.3296201 -0.381031737   -0.1213729  -0.3948477
+## Cluster 3   -0.2555600 -0.008356765   -0.3703264  -0.3768694
+## 
+## Root Mean Squared Deviations (RMSD): 0.5794478 
+## Mean Absolute Deviation (MAD): 4.107291 
+## 
+## Membership degrees matrix (top and bottom 5 rows): 
+##   Cluster 1 Cluster 2   Cluster 3
+## 1 0.9797503   3.6e-08 0.000115388
+## 2 0.8663850   2.6e-08 0.000122701
+## 3 0.8784034   8.0e-09 0.000049248
+## 4 0.8200776   2.0e-08 0.000107585
+## 5 0.9664585   2.6e-08 0.000089677
+## ...
+##     Cluster 1 Cluster 2 Cluster 3
+## 146 1.030e-07 0.8784889 0.2214961
+## 147 1.453e-06 0.6241410 0.5583624
+## 148 4.020e-07 0.9302419 0.3772716
+## 149 1.110e-07 0.7243457 0.1946746
+## 150 3.483e-06 0.5782990 0.6153330
+## 
+## Descriptive statistics for the membership degrees by clusters
+##           Size        Min        Q1      Mean    Median        Q3
+## Cluster 1   50 0.31374943 0.7305122 0.8161604 0.8715939 0.9185827
+## Cluster 2   42 0.07319914 0.4725497 0.6552011 0.7293231 0.8715668
+## Cluster 3   58 0.10571370 0.5836813 0.6754658 0.7131837 0.8045532
+##                 Max
+## Cluster 1 0.9976897
+## Cluster 2 0.9708134
+## Cluster 3 0.9806048
+## 
+## Dunn's Fuzziness Coefficients:
+## dunn_coeff normalized 
+##  0.6169534  0.4254301 
+## 
+## Within cluster sum of squares by cluster:
+##        1        2        3 
+## 15.15100 29.10857 35.21241 
+## (between_SS / total_SS =  87.52%) 
+## 
+## Available components: 
+##  [1] "u"          "t"          "v"          "v0"         "d"         
+##  [6] "x"          "cluster"    "csize"      "sumsqrs"    "k"         
+## [11] "m"          "eta"        "a"          "b"          "beta"      
+## [16] "iter"       "best.start" "func.val"   "comp.time"  "inpargs"   
+## [21] "algorithm"  "call"
+plotcluster(res.upfc, cp=1, trans=TRUE)
+```
+```{r}
+plotcluster(res.upfc, cp=1, tv=0.25, trans=TRUE)
+plotcluster(res.upfc, mt="u", cp=1, trans=TRUE)
+res.upfc2 <- ppclust2(res.upfc, "kmeans")
+factoextra::fviz_cluster(res.upfc2, data = x, 
+  ellipse.type = "convex",
+  palette = "jco",
+  repel = TRUE)
+```
+```{r}
+res.upfc3 <- ppclust2(res.upfc, "fanny")
+
+cluster::clusplot(scale(x), res.upfc3$cluster,  
+  main = "Cluster plot of Iris data set",
+  color=TRUE, labels = 2, lines = 2, cex=1)
+```
+```{r}
+res.upfc4 <- ppclust2(res.upfc, "fclust")
+idxsf <- SIL.F(res.upfc4$Xca, res.upfc4$U, alpha=1)
+idxpe <- PE(res.upfc4$U)
+idxpc <- PC(res.upfc4$U)
+idxmpc <- MPC(res.upfc4$U)
+cat("Partition Entropy: ", idxpe)
+## Partition Entropy:  0.3614377
+cat("Partition Coefficient: ", idxpc)
+## Partition Coefficient:  0.6169534
+cat("Modified Partition Coefficient: ", idxmpc)
+## Modified Partition Coefficient:  0.4254301
+cat("Fuzzy Silhouette Index: ", idxsf)
+## Fuzzy Silhouette Index:  0.8262374
+```
+# Referensi
+https://stackoverflow.com/questions/53284245/fuzzy-c-means-clustering-in-r?newreg=8884e2e91f694f458b807d2b3c0be402&answertab=trending#tab-top
+https://github.com/NizamZidan10

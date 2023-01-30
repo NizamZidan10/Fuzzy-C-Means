@@ -3,15 +3,15 @@ title: "Algoritma Fuzzy C Means Dengan R"
 author: "A. Nizam Zidan-Institut Teknologi Statistika dan Bisnis Muhammadiyah"
 date: "`r Sys.Date()`"
 output: 
-  rmdformats::readthedown:
-    self_contained: true
-    thumbnails: true
-    lightbox: true
-    gallery: false
-    highlight: tango
+  html_document:
+    theme: flatly
+    higlight: zenburn
+    toc: true
+    toc_float:
+      collapsed: true
+    df_print: paged
 bibliography: references.bib
-```
-
+---
 # Algoritma Fuzzy C-Means
 Fuzzy C-Means adalah salah satu algoritma dari teknik clustering atau pengelompokkan data.
 Fuzzy C-Means tidak hanya memiliki nilai yang sama dalam satu cluster tetapi juga memiliki dua atau lebih kelompok menurut level keanggotaannya.
@@ -21,9 +21,10 @@ Fuzzy c means termasuk kedalam soft clustering karena penentuan keanggotaannya b
 
 # Eksperimen Algoritma Fuzzy C-Means
 ```{r}
-clVlist <- lapply(3:12, function(x) clara(y[1:30, ], k=x)$clustering); names(clVlist) <- paste("k", "=", 3:12)
-d <- sapply(names(clVlist), function(x) sapply(names(clVlist), function(y) cindex(clV1=clVlist[[y]], clV2=clVlist[[x]], method="jaccard")[[3]]))
-hv <- hclust(as.dist(1-d))
-plot(as.dendrogram(hv), edgePar=list(col=3, lwd=4), horiz=T, main="Similarities of 10 Clara Clustering Results for k: 3-12") 
+data <- read.delim(file.choose(), header = T)
+View(data)
+data.features = data
+View(data.features)
+library(e1071)
 ```
 
